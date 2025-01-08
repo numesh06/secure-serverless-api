@@ -1,0 +1,76 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "SecureServerlessAPI",
+    "version" : "2025-01-08T06:47:02Z"
+  },
+  "servers" : [ {
+    "url" : "https://cnwgj6nhg6.execute-api.us-east-1.amazonaws.com/{basePath}",
+    "variables" : {
+      "basePath" : {
+        "default" : "prod"
+      }
+    }
+  } ],
+  "paths" : {
+    "/secure-endpoint" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "description" : "200 response",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Empty"
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "CognitoAuthorizer" : [ ]
+        }, {
+          "api_key" : [ ]
+        } ],
+        "x-amazon-apigateway-integration" : {
+          "type" : "aws_proxy",
+          "httpMethod" : "POST",
+          "uri" : "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/arn:aws:lambda:us-east-1:590183674500:function:SecureServerlessFunction/invocations",
+          "responses" : {
+            "default" : {
+              "statusCode" : "200"
+            }
+          },
+          "passthroughBehavior" : "when_no_match",
+          "timeoutInMillis" : 29000,
+          "contentHandling" : "CONVERT_TO_TEXT"
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Empty" : {
+        "title" : "Empty Schema",
+        "type" : "object"
+      }
+    },
+    "securitySchemes" : {
+      "api_key" : {
+        "type" : "apiKey",
+        "name" : "x-api-key",
+        "in" : "header"
+      },
+      "CognitoAuthorizer" : {
+        "type" : "apiKey",
+        "name" : "Authorization",
+        "in" : "header",
+        "x-amazon-apigateway-authtype" : "cognito_user_pools",
+        "x-amazon-apigateway-authorizer" : {
+          "type" : "cognito_user_pools",
+          "providerARNs" : [ "arn:aws:cognito-idp:us-east-1:590183674500:userpool/us-east-1_Hql64sYcR" ]
+        }
+      }
+    }
+  }
+}
